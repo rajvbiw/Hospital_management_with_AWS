@@ -1,160 +1,258 @@
 # CareSuite: Hospital Patient Management System (PMS)
 
-CareSuite is a production-ready, full-stack Hospital Patient Management System (PMS) built with React, Node.js, and MySQL. It features role-based access control (RBAC), HIPAA-compliant automatic audit logging, patient demographic charting, medical records, scheduling, billing collection, and pharmacy inventory control.
+**CareSuite** is a production‑ready, full‑stack Hospital Patient Management System built with **React**, **Vite**, **Node.js**, **Express**, and **MySQL**. It provides role‑based access control (RBAC), HIPAA‑compliant audit logging, patient charting, scheduling, billing, and pharmacy inventory management.
 
-## System Architecture
+---
+
+## 📋 Table of Contents
+1. [Project Overview](#project-overview)
+2. [Features](#features)
+3. [System Architecture](#system-architecture)
+4. [Tech Stack](#tech-stack)
+5. [Prerequisites](#prerequisites)
+6. [Environment Variables](#environment-variables)
+7. [Local Setup](#local-setup)
+8. [Running with Docker](#running-with-docker)
+9. [AWS Deployment (Terraform)](#aws-deployment-terraform)
+10. [Default Login Credentials](#default-login-credentials)
+11. [Backend API Endpoints](#backend-api-endpoints)
+12. [Screenshots](#screenshots)
+13. [Contributing](#contributing)
+14. [License](#license)
+
+---
+
+## 🎯 Project Overview
+CareSuite aims to streamline hospital operations by providing a single platform for clinicians, nurses, pharmacists, and billing staff. The system is designed with **privacy**, **scalability**, and **extensibility** in mind, making it suitable for on‑premise deployments or cloud‑native environments.
+
+---
+
+## ✨ Features
+- **RBAC & Secure Authentication** – JWT based login with role‑specific permissions.
+- **Patient Demographics & Medical Records** – CRUD operations, chart logs, and prescription history.
+- **Appointment Scheduling** – Calendar view, doctor‑specific slots, and status tracking.
+- **Pharmacy Inventory** – Stock management, dispensing workflow, and alerts.
+- **Billing & Invoice Management** – Automatic invoice generation, payment tracking.
+- **Audit Logging** – Immutable logs for every critical action (HIPAA compliance).
+- **Dashboard & Analytics** – KPI visualisations via Grafana.
+- **Dockerised Development** – Containers for backend, frontend, and MySQL.
+- **Terraform + AWS** – Infrastructure as code for production deployments.
+
+---
+
+## 🏗️ System Architecture
 
 ```text
-       +------------------+
-       |     Browser      |
-       +--------+---------+
-                | (HTTPS / HTTP)
-                v
-       +------------------+
-       |   Vite/React     | <-----+  (Serves Assets)
-       |   (Port 5173)    |       |
-       +--------+---------+       |
-                | (Rest APIs)     |
-                v                 |
-       +------------------+       |
-       |  Nginx Proxy     | ------+  (Optional Production Ingress Router)
-       |  (Ingress Port)  |
-       +--------+---------+
-                |
-                v
-       +------------------+
-       | Node.js Backend  |
-       |   (Port 5000)    |
-       +--------+---------+
-                | (SQL Parameterized Queries)
-                v
-       +------------------+
-       |     MySQL 8      |
-       |   (Port 3306)    |
-       +------------------+
+        +------------------+
+        |     Browser      |
+        +--------+---------+
+                 | (HTTPS / HTTP)
+                 v
+        +------------------+
+        |   Vite/React     | <-----+  (Serves Assets)
+        |   (Port 5173)    |       |
+        +--------+---------+       |
+                 | (Rest APIs)     |
+                 v                 |
+        +------------------+       |
+        |  Nginx Proxy     | ------+  (Optional Production Ingress Router)
+        |  (Ingress Port)  |
+        +--------+---------+
+                 |
+                 v
+        +------------------+
+        | Node.js Backend  |
+        |   (Port 5000)    |
+        +--------+---------+
+                 | (SQL Parameterized Queries)
+                 v
+        +------------------+
+        |     MySQL 8      |
+        |   (Port 3306)    |
+        +------------------+
 ```
 
 ---
 
-## Prerequisites
+## 🛠️ Tech Stack
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, Vite, TypeScript, TailwindCSS |
+| Backend | Node.js 18, Express, JWT, Bcrypt |
+| Database | MySQL 8 |
+| Containerisation | Docker, Docker‑Compose |
+| Infrastructure | Terraform, AWS (EKS, RDS) |
+| Monitoring | Grafana, Prometheus |
+| CI/CD | GitHub Actions |
 
+---
+
+## 📦 Prerequisites
 - **Node.js**: v18.x or higher
-- **NPM**: v9.x or higher
-- **MySQL Database**: v8.0 or higher (running locally or remotely)
+- **npm**: v9.x or higher
+- **MySQL**: v8.0 or higher (local or remote)
+- **Docker & Docker‑Compose** (optional, for containerised dev)
+- **Terraform** (if deploying to AWS)
 
 ---
 
-## Environment Variables
-
+## ⚙️ Environment Variables
 ### Backend Configuration (`backend/.env`)
+Create a `.env` file inside the `backend` folder:
 
-Create a `.env` file inside the `backend` folder with the following variables:
-
-| Variable | Description | Default / Example Value |
-|---|---|---|
-| `PORT` | Port for the backend Express server | `5000` |
-| `DB_NAME` | MySQL database name | `hospital_pms` |
-| `DB_USER` | MySQL database username | `root` |
-| `DB_PASSWORD` | MySQL database password | `password` |
-| `DB_HOST` | MySQL server host | `localhost` |
-| `DB_PORT` | MySQL server port | `3306` |
-| `ACCESS_TOKEN_SECRET` | Secret key for signing JWT Access Tokens | `supersecret_access_key_12345` |
-| `REFRESH_TOKEN_SECRET` | Secret key for signing JWT Refresh Tokens | `supersecret_refresh_key_54321` |
-| `FRONTEND_URL` | CORS authorized origin URL | `http://localhost:5173` |
+```dotenv
+PORT=5000
+DB_NAME=hospital_pms
+DB_USER=root
+DB_PASSWORD=password
+DB_HOST=localhost
+DB_PORT=3306
+ACCESS_TOKEN_SECRET=supersecret_access_key_12345
+REFRESH_TOKEN_SECRET=supersecret_refresh_key_54321
+FRONTEND_URL=http://localhost:5173
+```
 
 ---
 
-## Local Setup
-
-### 1. Database Setup
-Ensure your MySQL server is running, and create a database named `hospital_pms` (or as configured in `.env`):
+## 🚀 Local Setup
+### 1️⃣ Database Setup
 ```sql
 CREATE DATABASE hospital_pms;
 ```
 
-### 2. Backend Installation and Seed
+### 2️⃣ Backend Installation & Seed
 ```bash
-# Navigate to backend directory
 cd backend
-
-# Install dependencies
 npm install
-
-# Run seeder file (Compiles models and imports 5 doctors, 20 patients, 30 appointments, and inventory items)
-npm run db:seed
-
-# Start backend in development mode
-npm run dev
+npm run db:seed   # loads demo doctors, patients, appointments, inventory
+npm run dev        # starts backend on http://localhost:5000
 ```
 
-### 3. Frontend Installation and Run
+### 3️⃣ Frontend Installation & Run
 ```bash
-# Navigate to frontend directory
 cd ../frontend
-
-# Install dependencies
 npm install
-
-# Start Vite server
-npm run dev
+npm run dev        # starts Vite on http://localhost:5173
 ```
 Open your browser and navigate to `http://localhost:5173`.
 
 ---
 
-## Default Login Credentials for Demo
+## 🐳 Running with Docker
+```bash
+# From the project root
+docker-compose up -d   # brings up mysql, backend, frontend, nginx
+```
+The application will be reachable at `http://localhost` (nginx proxy).
 
+---
+
+## ☁️ AWS Deployment (Terraform)
+1. Install Terraform 1.6+.
+2. Update `terraform/variables.tf` with your AWS credentials and preferred region.
+3. Run:
+```bash
+cd terraform
+terraform init
+terraform apply   # creates VPC, RDS, EKS, IAM roles, etc.
+```
+The `helm` chart in `k8s/` will deploy the containers to the created EKS cluster.
+
+---
+
+## 🔐 Default Login Credentials for Demo
 All accounts share the default password: **`password123`**
 
 | Role | Username / Email | Key Features Visible |
 |---|---|---|
 | **Admin** | `admin@hospital.com` | Access to everything + Audit logs |
 | **Doctor** | `sarah.connor@hospital.com` | Appointments schedule, Patient records creation, Clinical logs |
-| **Nurse** | `florence@hospital.com` | Patient demographic management, scheduling check-ins |
+| **Nurse** | `florence@hospital.com` | Patient demographic management, scheduling check‑ins |
 | **Pharmacist** | `pharmacist@hospital.com` | Stock inventory control, Prescription dispensing |
 | **Billing** | `billing@hospital.com` | Financial stats, Invoice collections, Payments logging |
 
 ---
 
-## Backend API Endpoints
+## 📡 Backend API Endpoints
+### 1️⃣ Authentication
+- `POST /api/auth/login` – user login (returns access & refresh token)
+- `POST /api/auth/refresh` – refresh access token
+- `POST /api/auth/logout` – logout
 
-### 1. Authentication
-- `POST /api/auth/login` - User login (returns access token, refresh token, role details)
-- `POST /api/auth/refresh` - Refresh access token using refresh token
-- `POST /api/auth/logout` - User logout
+### 2️⃣ Patients (RBAC Guarded)
+- `GET /api/patients` – list patients (search, pagination)
+- `GET /api/patients/:id` – patient demographics
+- `POST /api/patients` – register patient
+- `PUT /api/patients/:id` – update patient
+- `GET /api/patients/:id/records` – chart logs & prescriptions
+- `GET /api/patients/:id/billing` – financial invoices
 
-### 2. Patients (RBAC Guarded)
-- `GET /api/patients` - List patients (supports search and pagination)
-- `GET /api/patients/:id` - Fetch patient demographics
-- `POST /api/patients` - Register patient
-- `PUT /api/patients/:id` - Update patient details
-- `GET /api/patients/:id/records` - Fetch patient chart logs and prescriptions
-- `GET /api/patients/:id/billing` - Fetch patient financial invoices
+### 3️⃣ Appointments
+- `GET /api/appointments` – query visits (filters)
+- `POST /api/appointments` – book appointment
+- `PUT /api/appointments/:id` – update / check‑in
+- `DELETE /api/appointments/:id` – cancel
+- `GET /api/appointments/doctors` – doctor list for dropdowns
 
-### 3. Appointments
-- `GET /api/appointments` - Query scheduled visits (filters: date, doctor, status)
-- `POST /api/appointments` - Book appointment
-- `PUT /api/appointments/:id` - Update schedule or visit check-in status
-- `DELETE /api/appointments/:id` - Cancel and delete appointment
-- `GET /api/appointments/doctors` - Dynamic listing of doctors for booking dropdowns
+### 4️⃣ Medical Records
+- `GET /api/records/:id` – view record
+- `POST /api/records` – create record
+- `PUT /api/records/:id` – modify record
 
-### 4. Medical Records
-- `GET /api/records/:id` - Inspect clinical record
-- `POST /api/records` - Log consultation record (supports compound prescription logging)
-- `PUT /api/records/:id` - Modify diagnosis or notes
+### 5️⃣ Pharmacy (Pharmacist/Admin Only)
+- `GET /api/pharmacy/inventory` – stock details
+- `POST /api/pharmacy/inventory` – add medication
+- `PUT /api/pharmacy/inventory/:id` – restock / edit price
+- `GET /api/pharmacy/prescriptions/pending` – pending prescriptions
+- `PUT /api/pharmacy/prescriptions/:id/dispense` – dispense medication
 
-### 5. Pharmacy (Pharmacist/Admin Only)
-- `GET /api/pharmacy/inventory` - Get drug stock details
-- `POST /api/pharmacy/inventory` - Add new medication
-- `PUT /api/pharmacy/inventory/:id` - Restock medication quantities or edit price
-- `GET /api/pharmacy/prescriptions/pending` - Inspect pending prescriptions
-- `PUT /api/pharmacy/prescriptions/:id/dispense` - Dispense medication (decrements stock)
+### 6️⃣ Billing (Billing Clerk/Admin Only)
+- `GET /api/billing` – list invoices (filters)
+- `POST /api/billing` – create invoice
+- `PUT /api/billing/:id/payment` – record payment
 
-### 6. Billing (Billing Clerk/Admin Only)
-- `GET /api/billing` - List invoices (filters: pending, partial, paid)
-- `POST /api/billing` - Create invoice statement
-- `PUT /api/billing/:id/payment` - Collect payment on outstanding balance
+### 7️⃣ Dashboard & Auditing
+- `GET /api/dashboard/stats` – KPI totals & scheduling loads
+- `GET /api/audit-logs` – HIPAA audit entries (Admin only)
 
-### 7. Dashboard & Auditing
-- `GET /api/dashboard/stats` - Analytical KPI totals and appointment scheduling loads
-- `GET /api/audit-logs` - Inspect HIPAA audit mutation entries (Admin Only)
+---
+
+## 📸 Screenshots
+Below are key screenshots of the system:
+
+![Architecture Diagram](screen%20shot/architecture.png)
+
+![Dashboard 1](screen%20shot/dashboard-1.png)
+
+![Dashboard 2](screen%20shot/dashboard-2.png)
+
+![Git Action Workflow](screen%20shot/gitaction.png)
+
+![Grafana Dashboard 1](screen%20shot/grafana-Dashboard-1.png)
+
+![Grafana Dashboard 2](screen%20shot/grafana-Dashboard-2.png)
+
+![Grafana Dashboard 3](screen%20shot/grafana-Dashboard-3.png)
+
+![Grafana Dashboard 4](screen%20shot/grafana-Dashboard-4.png)
+
+![Grafana Dashboard 5](screen%20shot/grafana-Dashboard-5.png)
+
+![Grafana Dashboard 6](screen%20shot/grafana-Dashboard-6.png)
+
+---
+
+## 🤝 Contributing
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/awesome-feature`).
+3. Ensure linting passes (`npm run lint`).
+4. Open a Pull Request with a clear description of the change.
+
+---
+
+## 📄 License
+This project is licensed under the **MIT License**. See the `LICENSE` file for details.
+
+---
+
+*Feel free to reach out if you need any further customization or deployment assistance!*
