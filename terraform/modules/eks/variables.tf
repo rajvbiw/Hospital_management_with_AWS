@@ -23,7 +23,7 @@ variable "node_instance_type" {
 variable "node_desired_capacity" {
   description = "Desired number of worker nodes"
   type        = number
-  default     = 1
+  default     = 2
 }
 
 variable "tags" {
