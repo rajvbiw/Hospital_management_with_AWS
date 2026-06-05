@@ -6,18 +6,18 @@ import {
   Users, 
   Calendar, 
   FileText, 
-  Pills, 
+  Pill, 
   CreditCard, 
   History, 
   LogOut, 
   Bell, 
-  User as UserIcon,
   Menu,
   X,
   CheckCircle,
   XCircle,
   AlertCircle
 } from 'lucide-react';
+
 
 interface ToastMessage {
   id: number;
@@ -61,7 +61,8 @@ const Layout: React.FC = () => {
     { name: 'Patients', path: '/patients', icon: Users, roles: ['admin', 'doctor', 'nurse', 'billing'] },
     { name: 'Appointments', path: '/appointments', icon: Calendar, roles: ['admin', 'doctor', 'nurse', 'billing'] },
     { name: 'Medical Records', path: '/records', icon: FileText, roles: ['admin', 'doctor', 'nurse'] },
-    { name: 'Pharmacy', path: '/pharmacy', icon: Pills, roles: ['admin', 'pharmacist'] },
+    { name: 'Pharmacy', path: '/pharmacy', icon: Pill, roles: ['admin', 'pharmacist'] },
+
     { name: 'Billing', path: '/billing', icon: CreditCard, roles: ['admin', 'billing'] },
     { name: 'Audit Log', path: '/audit', icon: History, roles: ['admin'] },
   ];

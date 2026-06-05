@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { 
   Search, 
-  Plus, 
   Edit2, 
   Eye, 
   X, 
@@ -66,7 +65,7 @@ const Patients: React.FC = () => {
   const canMutate = ['admin', 'doctor', 'nurse'].includes(user?.role || '');
 
   // Fetch Patients Query
-  const { data, isLoading, isPlaceholderData } = useQuery<PatientsResponse>({
+  const { data, isLoading } = useQuery<PatientsResponse>({
     queryKey: ['patients', page, search],
     queryFn: async () => {
       const res = await api.get('/api/patients', {

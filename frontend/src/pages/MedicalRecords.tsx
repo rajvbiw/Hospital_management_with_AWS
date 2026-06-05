@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { 
-  FileText, 
   User as UserIcon, 
   Search, 
   Plus, 
@@ -11,7 +10,7 @@ import {
   ArrowLeft,
   Activity,
   HeartPulse,
-  Pills
+  Pill
 } from 'lucide-react';
 import { triggerToast } from '../components/Layout';
 
@@ -90,7 +89,7 @@ const MedicalRecords: React.FC = () => {
     mutationFn: async (payload: any) => {
       return api.post('/api/records', payload);
     },
-    onSuccess: (data) => {
+    onSuccess: (_data) => {
       triggerToast('success', 'Medical record & prescriptions logged!');
       // Navigate to patient folder
       navigate(`/patients/${patientId}`);
@@ -306,7 +305,7 @@ const MedicalRecords: React.FC = () => {
         <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
           <div className="flex justify-between items-center border-b pb-2 mb-4">
             <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-              <Pills size={16} />
+              <Pill size={16} />
               <span>Medication Order Entries</span>
             </h3>
             <button

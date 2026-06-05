@@ -3,14 +3,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { 
   CreditCard, 
-  Search, 
   DollarSign, 
   Clock, 
   CheckCircle, 
   X,
-  TrendingUp,
-  AlertCircle,
-  FileText
+  TrendingUp
 } from 'lucide-react';
 import { triggerToast } from '../components/Layout';
 
@@ -35,7 +32,7 @@ interface Bill {
 }
 
 const Billing: React.FC = () => {
-  const { user, api } = useAuth();
+  const { api } = useAuth();
   const queryClient = useQueryClient();
 
   const [filterStatus, setFilterStatus] = useState('');

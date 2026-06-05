@@ -5,17 +5,15 @@ import { useAuth } from '../context/AuthContext';
 import { 
   User, 
   FileText, 
-  Pills, 
+  Pill, 
   CreditCard, 
   ArrowLeft,
   Calendar,
-  AlertCircle,
-  Activity,
   Plus,
   CheckCircle,
   Clock,
   DollarSign,
-  UserCheck
+  X
 } from 'lucide-react';
 import { triggerToast } from '../components/Layout';
 
@@ -275,7 +273,7 @@ const PatientDetail: React.FC = () => {
         {[
           { id: 'info', label: 'Patient Information', icon: User },
           { id: 'records', label: 'Medical History', icon: FileText },
-          { id: 'prescriptions', label: 'Prescriptions', icon: Pills },
+          { id: 'prescriptions', label: 'Prescriptions', icon: Pill },
           { id: 'billing', label: 'Billing & Invoices', icon: CreditCard }
         ].map(tab => {
           const Icon = tab.icon;

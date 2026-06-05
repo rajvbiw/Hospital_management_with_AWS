@@ -3,9 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { 
   Calendar as CalendarIcon, 
-  User, 
   Clock, 
-  Filter, 
   Plus, 
   X, 
   Trash2, 
@@ -14,6 +12,7 @@ import {
   FileCheck,
   ChevronRight
 } from 'lucide-react';
+
 import { triggerToast } from '../components/Layout';
 
 interface Doctor {

@@ -2,16 +2,12 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import { 
-  Pills, 
+  Pill, 
   Plus, 
   AlertTriangle, 
-  CheckCircle,
   X,
   FileCheck,
-  Calendar,
-  AlertCircle,
-  Clock,
-  DollarSign
+  AlertCircle
 } from 'lucide-react';
 import { triggerToast } from '../components/Layout';
 
@@ -154,7 +150,7 @@ const Pharmacy: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
-            <Pills className="text-[#0F3460]" size={28} />
+            <Pill className="text-[#0F3460]" size={28} />
             <span>Pharmacy Portal</span>
           </h1>
           <p className="text-slate-500 mt-1">Dispense prescription orders and monitor drug inventory levels.</p>
@@ -371,7 +367,7 @@ const Pharmacy: React.FC = () => {
             {/* Modal Header */}
             <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
               <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                <Pills size={20} className="text-[#0F3460]" />
+                <Pill size={20} className="text-[#0F3460]" />
                 <span>Register New Medication</span>
               </h2>
               <button onClick={() => setModalOpen(false)} className="text-slate-400 hover:text-slate-650">
