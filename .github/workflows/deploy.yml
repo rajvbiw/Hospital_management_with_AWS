@@ -113,6 +113,18 @@ jobs:
           kubectl cluster-info
           kubectl get nodes
 
+      - name: Reset Grafana Admin Password
+        run: |
+          echo "🔍 Locating Grafana pod..."
+          GRAFANA_POD=$(kubectl get pods -n monitoring --no-headers -o custom-columns=":metadata.name" | grep grafana | head -n 1 || echo "")
+          if [ -n "$GRAFANA_POD" ]; then
+            echo "Found Grafana Pod: $GRAFANA_POD"
+            kubectl exec "$GRAFANA_POD" -c grafana -n monitoring -- grafana-cli admin reset-admin-password Grafana123!
+            echo "✅ Grafana admin password reset successfully to: Grafana123!"
+          else
+            echo "⚠️ Grafana pod not found in monitoring namespace!"
+          fi
+
       # ── Namespace & Config Apply ──────────────────────────────
       - name: Apply Namespace
         run: kubectl apply -f k8s/namespace.yaml
