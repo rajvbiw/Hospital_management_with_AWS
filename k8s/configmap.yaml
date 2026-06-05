@@ -7,9 +7,8 @@ metadata:
     app: hospital-management
 
 data:
-  DB_NAME: "${MYSQL_DATABASE}"
-  DB_USER: "${MYSQL_USER}"
+  DB_NAME: "${DB_NAME}"
+  DB_USER: "${DB_USER}"
   DB_HOST: "${DB_HOST}"
   DB_PORT: "3306"
   FRONTEND_URL: "http://localhost"
-
