@@ -171,9 +171,43 @@ jobs:
       - name: Deploy Backend to EKS
         run: |
           kubectl apply -f k8s/deployment-backend.yaml
-          kubectl rollout status deployment/backend-deployment \
+
+          echo "⏳ Waiting for backend rollout..."
+          if ! kubectl rollout status deployment/backend-deployment \
             --namespace=${{ env.K8S_NAMESPACE }} \
-            --timeout=600s
+            --timeout=300s; then
+
+            echo ""
+            echo "❌ Rollout failed! Gathering diagnostics..."
+            echo "=============================="
+            echo "📋 Pod Status:"
+            kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=backend -o wide
+
+            echo ""
+            echo "📋 Pod Events (last 20):"
+            kubectl get events -n ${{ env.K8S_NAMESPACE }} \
+              --sort-by='.lastTimestamp' \
+              --field-selector involvedObject.kind=Pod | tail -20
+
+            echo ""
+            echo "📋 Deployment Description:"
+            kubectl describe deployment/backend-deployment -n ${{ env.K8S_NAMESPACE }}
+
+            echo ""
+            echo "📋 Pod Logs (last 50 lines):"
+            BACKEND_POD=$(kubectl get pods -n ${{ env.K8S_NAMESPACE }} \
+              -l app=backend \
+              --sort-by='.metadata.creationTimestamp' \
+              -o jsonpath='{.items[-1].metadata.name}' 2>/dev/null || echo "")
+            if [ -n "$BACKEND_POD" ]; then
+              kubectl logs "$BACKEND_POD" -n ${{ env.K8S_NAMESPACE }} --tail=50 || true
+              echo ""
+              echo "📋 Previous container logs (if crashed):"
+              kubectl logs "$BACKEND_POD" -n ${{ env.K8S_NAMESPACE }} --previous --tail=30 || true
+            fi
+
+            exit 1
+          fi
           echo "✅ Backend deployed successfully"
 
       # ── Frontend Deploy ───────────────────────────────────────
@@ -191,9 +225,43 @@ jobs:
       - name: Deploy Frontend to EKS
         run: |
           kubectl apply -f k8s/deployment-frontend.yaml
-          kubectl rollout status deployment/hospital-frontend \
+
+          echo "⏳ Waiting for frontend rollout..."
+          if ! kubectl rollout status deployment/hospital-frontend \
             --namespace=${{ env.K8S_NAMESPACE }} \
-            --timeout=600s
+            --timeout=300s; then
+
+            echo ""
+            echo "❌ Frontend rollout failed! Gathering diagnostics..."
+            echo "=============================="
+            echo "📋 Pod Status:"
+            kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=hospital-frontend -o wide
+
+            echo ""
+            echo "📋 Pod Events (last 20):"
+            kubectl get events -n ${{ env.K8S_NAMESPACE }} \
+              --sort-by='.lastTimestamp' \
+              --field-selector involvedObject.kind=Pod | tail -20
+
+            echo ""
+            echo "📋 Deployment Description:"
+            kubectl describe deployment/hospital-frontend -n ${{ env.K8S_NAMESPACE }}
+
+            echo ""
+            echo "📋 Pod Logs (last 50 lines):"
+            FRONTEND_POD=$(kubectl get pods -n ${{ env.K8S_NAMESPACE }} \
+              -l app=hospital-frontend \
+              --sort-by='.metadata.creationTimestamp' \
+              -o jsonpath='{.items[-1].metadata.name}' 2>/dev/null || echo "")
+            if [ -n "$FRONTEND_POD" ]; then
+              kubectl logs "$FRONTEND_POD" -n ${{ env.K8S_NAMESPACE }} --tail=50 || true
+              echo ""
+              echo "📋 Previous container logs (if crashed):"
+              kubectl logs "$FRONTEND_POD" -n ${{ env.K8S_NAMESPACE }} --previous --tail=30 || true
+            fi
+
+            exit 1
+          fi
           echo "✅ Frontend deployed successfully"
 
       # ── Get App URL ───────────────────────────────────────────
