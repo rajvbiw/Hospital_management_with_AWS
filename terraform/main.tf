@@ -31,14 +31,14 @@ module "vpc" {
   tags   = var.common_tags
 }
 
-# ==== EKS Module (t3.medium — supports 17 pods per node, enough for app + monitoring) ====
+# ==== EKS Module (t3.small — 2 nodes to support monitoring + app pods) ====
 module "eks" {
   source                = "./modules/eks"
   cluster_name          = var.project_name
   vpc_id                = module.vpc.vpc_id
   private_subnet_ids    = module.vpc.private_subnet_ids
-  node_instance_type    = "t3.medium"   # upgraded: t3.small=11 pods, t3.medium=17 pods
-  node_desired_capacity = 1
+  node_instance_type    = "t3.small"   # reverted: t3.medium was blocked by Free Tier / Academy limits
+  node_desired_capacity = 2            # increased to 2 nodes to support up to 22 pods
   tags                  = var.common_tags
 }
 
