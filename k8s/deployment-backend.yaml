@@ -10,14 +10,22 @@ spec:
   selector:
     matchLabels:
       app: backend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0        # zero-downtime: new pod ready before old is killed
   template:
     metadata:
       labels:
         app: backend
     spec:
+      imagePullSecrets:
+        - name: dockerhub-secret   # required to pull from Docker Hub private registry
       containers:
         - name: backend
-          image: hospital_backend:latest
+          image: hospital-pms-backend:latest   # replaced by sed in deploy.yml CI step
+          imagePullPolicy: Always              # always pull latest from Docker Hub
           ports:
             - containerPort: 5000
           envFrom:
@@ -29,14 +37,23 @@ spec:
             httpGet:
               path: /health
               port: 5000
-            initialDelaySeconds: 10
+            initialDelaySeconds: 30   # give backend time to connect to RDS on startup
             periodSeconds: 10
+            failureThreshold: 6       # 60s total grace period before pod marked Unready
           livenessProbe:
             httpGet:
               path: /health
               port: 5000
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
             periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
 ---
 apiVersion: v1
 kind: Service
@@ -52,4 +69,3 @@ spec:
       protocol: TCP
   selector:
     app: backend
-

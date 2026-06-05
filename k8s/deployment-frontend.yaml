@@ -10,39 +10,48 @@ spec:
   selector:
     matchLabels:
       app: hospital-frontend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0        # zero-downtime rolling update
   template:
     metadata:
       labels:
         app: hospital-frontend
     spec:
+      imagePullSecrets:
+        - name: dockerhub-secret   # required to pull from Docker Hub
       containers:
         - name: frontend
-          image: hospital-frontend:latest
-          imagePullPolicy: IfNotPresent
+          image: hospital-pms-frontend:latest   # replaced by sed in deploy.yml CI step
+          imagePullPolicy: Always               # always pull latest from Docker Hub
           ports:
             - containerPort: 80
           envFrom:
             - configMapRef:
                 name: hospital-config
           resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
             limits:
               cpu: "500m"
               memory: "256Mi"
-            requests:
-              cpu: "250m"
-              memory: "128Mi"
           readinessProbe:
             httpGet:
               path: /
               port: 80
-            initialDelaySeconds: 5
+            initialDelaySeconds: 10
             periodSeconds: 10
+            failureThreshold: 3
           livenessProbe:
             httpGet:
               path: /
               port: 80
-            initialDelaySeconds: 15
+            initialDelaySeconds: 20
             periodSeconds: 20
+            failureThreshold: 3
 ---
 apiVersion: v1
 kind: Service
@@ -59,4 +68,3 @@ spec:
       protocol: TCP
   selector:
     app: hospital-frontend
-

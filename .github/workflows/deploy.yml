@@ -162,16 +162,18 @@ jobs:
           BACKEND_IMAGE: ${{ env.BACKEND_IMAGE }}
           IMAGE_TAG: ${{ needs.pre-deploy.outputs.image_tag }}
         run: |
-          sed -i "s|image: hospital_backend:latest|image: ${BACKEND_IMAGE}:${IMAGE_TAG}|g" \
+          sed -i "s|image: hospital-pms-backend:latest|image: ${BACKEND_IMAGE}:${IMAGE_TAG}|g" \
             k8s/deployment-backend.yaml
           echo "🐳 Backend image: ${BACKEND_IMAGE}:${IMAGE_TAG}"
+          echo "--- Resulting manifest ---"
+          grep 'image:' k8s/deployment-backend.yaml
 
       - name: Deploy Backend to EKS
         run: |
           kubectl apply -f k8s/deployment-backend.yaml
           kubectl rollout status deployment/backend-deployment \
             --namespace=${{ env.K8S_NAMESPACE }} \
-            --timeout=300s
+            --timeout=600s
           echo "✅ Backend deployed successfully"
 
       # ── Frontend Deploy ───────────────────────────────────────
@@ -180,16 +182,18 @@ jobs:
           FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE }}
           IMAGE_TAG: ${{ needs.pre-deploy.outputs.image_tag }}
         run: |
-          sed -i "s|image: hospital-frontend:latest|image: ${FRONTEND_IMAGE}:${IMAGE_TAG}|g" \
+          sed -i "s|image: hospital-pms-frontend:latest|image: ${FRONTEND_IMAGE}:${IMAGE_TAG}|g" \
             k8s/deployment-frontend.yaml
           echo "🐳 Frontend image: ${FRONTEND_IMAGE}:${IMAGE_TAG}"
+          echo "--- Resulting manifest ---"
+          grep 'image:' k8s/deployment-frontend.yaml
 
       - name: Deploy Frontend to EKS
         run: |
           kubectl apply -f k8s/deployment-frontend.yaml
           kubectl rollout status deployment/hospital-frontend \
             --namespace=${{ env.K8S_NAMESPACE }} \
-            --timeout=300s
+            --timeout=600s
           echo "✅ Frontend deployed successfully"
 
       # ── Get App URL ───────────────────────────────────────────
