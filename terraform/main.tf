@@ -121,4 +121,9 @@ resource "helm_release" "kube_prometheus_stack" {
     name  = "prometheus.prometheusSpec.resources.limits.memory"
     value = "512Mi"
   }
+
+  set {
+    name  = "grafana.grafana\\.ini.live.enabled"
+    value = "false"
+  }
 }
