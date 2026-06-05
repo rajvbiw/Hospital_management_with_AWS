@@ -84,6 +84,18 @@ const startServer = async () => {
     await sequelize.sync();
     console.log('Database models synchronized.');
 
+    // Auto-seed database if no users exist (fresh deployment)
+    const { User } = require('./models');
+    const userCount = await User.count();
+    if (userCount === 0) {
+      console.log('⚠️ No users found in database. Running auto-seeder...');
+      const seed = require('./seeders/demo');
+      await seed();
+      console.log('✅ Auto-seeding completed successfully.');
+    } else {
+      console.log(`ℹ️ Database already contains ${userCount} users. Skipping auto-seeding.`);
+    }
+
     app.listen(PORT, () => {
       console.log(`Hospital PMS backend API running on port ${PORT}`);
     });
